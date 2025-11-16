@@ -1,0 +1,27 @@
+class HTMLNode:
+    def __init__(self, tag = None, value = None, children = None, props = None):
+        # String of HTML tag name (e.g., "a", "div", "p")
+        self.tag = tag
+        # String of the value of the HTML tag (e.g., text in a paragraph)
+        self.value = value
+        # List of child HTMLNode objects
+        self.children = children
+        # Dictionary of attributes of the HTML tag (e.g., {"href": "https://example.com"})
+        self.props = props
+
+    def to_html(self):
+        # Convert the HTMLNode and its children to an HTML string
+        raise NotImplementedError("to_html method not implemented")
+    
+    def props_to_html(self):
+        if not self.props:
+            return ""
+        props_str = ""
+        # Convert props dictionary to HTML attributes string
+        for key, value in self.props.items():
+            props_str += f' {key}="{value}"'
+        return props_str
+    
+    def __repr__(self):
+        # String representation of the HTMLNode
+        return f"HTMLNode(tag={self.tag}, value={self.value}, children={self.children}, props={self.props})"
