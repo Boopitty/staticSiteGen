@@ -41,3 +41,18 @@ class LeafNode(HTMLNode):
             # if no tag, print raw value
             return self.value
         return f"<{self.tag}{self.props_to_html()}>{self.value}</{self.tag}>"
+
+class ParentNode(HTMLNode):
+    def __init__(self, tag, children=[], props=None):
+        # ParentNode MUST have a tag and children.
+        # ParentNode NEVER has a value. props is optional.
+        super().__init__(tag=tag, value=None, children=children, props=props)
+    
+    def to_html(self):
+        # Check for tag and children
+        if not self.tag:
+            raise ValueError("ParentNode must have a tag to convert to HTML")
+        if not self.children:
+            raise ValueError("ParentNode must have children to convert to HTML")
+        # Return HTML string with children converted to HTML
+        return f"<{self.tag}{self.props_to_html()}>{''.join(child.to_html() for child in self.children)}</{self.tag}>"

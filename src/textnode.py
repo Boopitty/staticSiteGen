@@ -8,6 +8,8 @@ class TextType(Enum):
     code = "code"
     link = "link"
     image = "image"
+    div = "div"
+    span = "span"
 
 class TextNode():
     def __init__(self, text="", text_type="plain", url=None):

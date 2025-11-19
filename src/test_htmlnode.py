@@ -1,5 +1,5 @@
 import unittest
-from htmlnode import HTMLNode, LeafNode
+from htmlnode import HTMLNode, LeafNode, ParentNode
 
 class TestHTMLNode(unittest.TestCase):
     def test_props_to_html_no_props(self):
@@ -31,3 +31,28 @@ class TestHTMLNode(unittest.TestCase):
     def test_leaf_to_html_no_tag(self):
         node = LeafNode(tag=None, value="Just some text")
         self.assertEqual(node.to_html(), "Just some text")
+
+    def test_to_html_with_children(self):
+        child_node = LeafNode("b", "child")
+        parent_node = ParentNode("div", [child_node])
+        self.assertEqual(parent_node.to_html(), "<div><b>child</b></div>")
+
+    def test_to_html_without_children(self):
+        parentNode = ParentNode("div")
+        with self.assertRaises(ValueError):
+            parentNode.to_html()
+    
+    def test_to_html_without_tag(self):
+        child_node = LeafNode("b", "child")
+        parentNode = ParentNode(None, [child_node])
+        with self.assertRaises(ValueError):
+            parentNode.to_html()
+
+    def test_to_html_with_grandchildren(self):
+        grandchild_node = LeafNode("b", "grandchild")
+        child_node = ParentNode("span", [grandchild_node])
+        parent_node = ParentNode("div", [child_node])
+        self.assertEqual(
+            parent_node.to_html(),
+            "<div><span><b>grandchild</b></span></div>",
+            )
