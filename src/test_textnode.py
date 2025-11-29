@@ -94,7 +94,7 @@ class TestTextNode(unittest.TestCase):
         old_nodes = [TextNode("No delimiters here", TextType.TEXT)]
         new_nodes = split_nodes_delimiter(old_nodes, "*", TextType.BOLD)
         self.assertEqual(new_nodes, [TextNode("No delimiters here", TextType.TEXT)])
-    
+     
     def test_split_nodes_delimiter_raise(self):
         # Test split_nodes_delimiter raises error for odd delimiters
         old_nodes = [TextNode("This is *an error", TextType.TEXT)]
