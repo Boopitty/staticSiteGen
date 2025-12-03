@@ -46,34 +46,4 @@ class TextNode():
                 return LeafNode(tag="a", value=text_node.text, props={"href": text_node.url})
             case TextType.IMAGE:
                 return LeafNode(tag="img", value="", props={"src": text_node.url, "alt": text_node.text})
-
-# Split a list of markdown TextNodes by a delimiter for a given text type
-def split_nodes_delimiter(old_nodes, delimiter, text_type):
-    new_nodes = []
-    for node in old_nodes:
-        # If node is not of the specified text_type, keep it as is
-        if node.text_type is not TextType.TEXT:
-            new_nodes.extend([node])
-        delimiters = 0
-
-        # Count pairs of delimiters
-        for char in node.text:
-            if char == delimiter:
-                delimiters += 1
-
-        # If delimiter count is even, continue, else raise exception
-        if delimiters % 2 == 0:
-            segments = node.text.split(delimiter)
-            # Reconstruct nodes based on segments
-            for i in range(len(segments)):
-                if segments[i] != "":
-                    if i % 2 == 0:
-                        new_nodes.append(TextNode(segments[i], TextType.TEXT))
-                    else:
-                        new_nodes.append(TextNode(segments[i], text_type))
-        else:
-            raise ValueError("Unmatched delimiter found in text.")        
-         
-        return new_nodes
-            
-        
+              

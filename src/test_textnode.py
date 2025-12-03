@@ -1,6 +1,5 @@
 import unittest
-
-from textnode import TextNode, TextType, split_nodes_delimiter
+from textnode import TextNode, TextType
 
 
 class TestTextNode(unittest.TestCase):
@@ -72,34 +71,6 @@ class TestTextNode(unittest.TestCase):
         self.assertEqual(html_node.value, "")
         self.assertEqual(html_node.props, {"src": "https://example.com/image.png", "alt": "An image"})
         self.assertEqual(html_node.children, None)
-    
-    def test_split_nodes_delimiter(self):
-        # Test split_nodes_delimiter method with multiple delimiters
-        old_nodes1 = [TextNode("This is *some* text with *delimiters*", TextType.TEXT)]
-        new_nodes1 = split_nodes_delimiter(old_nodes1, "*", TextType.BOLD)
-        self.assertEqual(new_nodes1, [TextNode("This is ", TextType.TEXT),
-                                     TextNode("some", TextType.BOLD),
-                                     TextNode(" text with ", TextType.TEXT),
-                                     TextNode("delimiters", TextType.BOLD)])
-        
-    def test_split_nodes_delimiter_edge(self):
-        # Test split_nodes_delimiter with delimiter at start
-        old_nodes = [TextNode("_delimiter_ at the start", TextType.TEXT)]
-        new_nodes = split_nodes_delimiter(old_nodes, "_", TextType.ITALIC)
-        self.assertEqual(new_nodes, [TextNode("delimiter", TextType.ITALIC),
-                                     TextNode(" at the start", TextType.TEXT)])
-    
-    def test_split_nodes_delimiter_no_delimiters(self):
-        # Test split_nodes_delimiter with no delimiters
-        old_nodes = [TextNode("No delimiters here", TextType.TEXT)]
-        new_nodes = split_nodes_delimiter(old_nodes, "*", TextType.BOLD)
-        self.assertEqual(new_nodes, [TextNode("No delimiters here", TextType.TEXT)])
-     
-    def test_split_nodes_delimiter_raise(self):
-        # Test split_nodes_delimiter raises error for odd delimiters
-        old_nodes = [TextNode("This is *an error", TextType.TEXT)]
-        with self.assertRaises(ValueError):
-            split_nodes_delimiter(old_nodes, "*", TextType.BOLD)
         
 if __name__ == "__main__":
     unittest.main()
