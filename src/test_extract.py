@@ -1,4 +1,4 @@
-from extract import split_nodes_delimiter, extract_markdown_images, extract_markdown_links, split_nodes_image, split_nodes_link
+from extract import split_nodes_delimiter, extract_markdown_images, extract_markdown_links, split_nodes_image, split_nodes_link, text_to_textnodes
 from textnode import TextNode, TextType
 import unittest # unittest will run all test_functions
 
@@ -29,7 +29,8 @@ class TestExtract(unittest.TestCase):
         # Test split_nodes_delimiter with no delimiters
         old_nodes = [TextNode("No delimiters here", TextType.TEXT)]
         new_nodes = split_nodes_delimiter(old_nodes, "*", TextType.BOLD)
-        self.assertEqual(new_nodes, [TextNode("No delimiters here", TextType.TEXT)])
+        self.assertEqual([TextNode("No delimiters here", TextType.TEXT)], 
+                         new_nodes)
      
     def test_split_nodes_delimiter_raise(self):
         # Test split_nodes_delimiter raises error for odd delimiters
@@ -37,6 +38,38 @@ class TestExtract(unittest.TestCase):
         with self.assertRaises(ValueError):
             split_nodes_delimiter(old_nodes, "*", TextType.BOLD)
     
+    def test_split_nodes_delimiter_empty_text(self):
+        # Test split_nodes_delimiter with empty text
+        old_nodes = [TextNode("", TextType.TEXT)]
+        new_nodes = split_nodes_delimiter(old_nodes, "*", TextType.BOLD)
+        self.assertEqual([TextNode("", TextType.TEXT)], 
+                         new_nodes)
+        
+    def test_split_nodes_delimiter_consecutive(self):
+        # Test split_nodes_delimiter with consecutive delimiters
+        old_nodes = [TextNode("**bold1****bold2**", TextType.TEXT)]
+        new_nodes = split_nodes_delimiter(old_nodes, "**", TextType.BOLD)
+        self.assertEqual(new_nodes, [TextNode("bold1", TextType.BOLD),
+                                     TextNode("bold2", TextType.BOLD)])
+    
+    def test_split_nodes_delimiter_list_of_nodes(self):
+        # Test split_nodes_delimiter with a list of nodes including non-text nodes
+        old_nodes = [
+            TextNode("First node with *bold*", TextType.TEXT),
+            TextNode("Second node without delimiter", TextType.TEXT),
+            TextNode("Third node with _italic_ and *bold*", TextType.TEXT),
+            TextNode("Fourth node is link", TextType.LINK, "https://example.com"),
+        ]
+        new_nodes = split_nodes_delimiter(old_nodes, "*", TextType.BOLD)
+        self.assertEqual(new_nodes, [
+            TextNode("First node with ", TextType.TEXT),
+            TextNode("bold", TextType.BOLD),
+            TextNode("Second node without delimiter", TextType.TEXT),
+            TextNode("Third node with _italic_ and ", TextType.TEXT),
+            TextNode("bold", TextType.BOLD),
+            TextNode("Fourth node is link", TextType.LINK, "https://example.com"),
+        ])
+        
     # EXTRACT MARKDOWN IMAGES TESTS
     # the extract_markdown_images function takes a string of text
     # and returns a list of tuples with the alt text and url of each image found
@@ -329,4 +362,27 @@ class TestExtract(unittest.TestCase):
                 TextNode("Seventh node with ![image](https://example.com/image.png)", TextType.TEXT),
             ],
             new_nodes,
+        )
+    
+    # TEXT TO TEXT NODES TESTS
+    # the text_to_text_nodes function takes a string of text
+    # and converts it into a list of TextNodes with appropriate types
+
+    def test_text_to_text_nodes(self):
+        text = "This is **text** with an _italic_ word and a `code block` and an ![obi wan image](https://i.imgur.com/fJRm4Vk.jpeg) and a [link](https://boot.dev)"
+        nodes = text_to_textnodes(text)
+        self.assertListEqual(
+            [
+                TextNode("This is ", TextType.TEXT),
+                TextNode("text", TextType.BOLD),
+                TextNode(" with an ", TextType.TEXT),
+                TextNode("italic", TextType.ITALIC),
+                TextNode(" word and a ", TextType.TEXT),
+                TextNode("code block", TextType.CODE),
+                TextNode(" and an ", TextType.TEXT),
+                TextNode("obi wan image", TextType.IMAGE, "https://i.imgur.com/fJRm4Vk.jpeg"),
+                TextNode(" and a ", TextType.TEXT),
+                TextNode("link", TextType.LINK, "https://boot.dev"),
+            ],
+            nodes,
         )

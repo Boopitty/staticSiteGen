@@ -7,7 +7,11 @@ def split_nodes_delimiter(old_nodes, delimiter, text_type):
     for node in old_nodes:
         # If node is not of the specified text_type, keep it as is
         if node.text_type is not TextType.TEXT:
-            new_nodes.extend([node])
+            new_nodes.append(node)
+            continue
+        if node.text == "":
+            new_nodes.append(node)
+            continue
         delimiters = 0
 
         # Count pairs of delimiters
@@ -28,7 +32,7 @@ def split_nodes_delimiter(old_nodes, delimiter, text_type):
         else:
             raise ValueError("Unmatched delimiter found in text.")        
          
-        return new_nodes
+    return new_nodes
     
 def extract_markdown_images(text):
     # Extract markdown image URLs from text
@@ -110,3 +114,13 @@ def split_nodes_link(old_nodes):
                 nodes.append(TextNode(text, TextType.TEXT))
                 break
     return nodes if nodes else old_nodes
+
+def text_to_textnodes(text):
+    # Convert a string of text into a list of TextNodes with appropriate types
+    nodes = [TextNode(text, TextType.TEXT)]
+    
+    for delimiter, text_type in [("_", TextType.ITALIC), ("**", TextType.BOLD), ("`", TextType.CODE)]:
+        nodes = split_nodes_delimiter(nodes, delimiter, text_type)
+    nodes = split_nodes_image(nodes)
+    nodes = split_nodes_link(nodes)
+    return nodes

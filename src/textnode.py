@@ -9,8 +9,9 @@ class TextType(Enum):
     CODE = "code"
     LINK = "link"
     IMAGE = "image"
-    DIV = "div"
-    SPAN = "span"
+    # Unused types for potential future use
+    # DIV = "div"
+    # SPAN = "span"
 
 class TextNode():
     def __init__(self, text="", text_type="text", url=None):
