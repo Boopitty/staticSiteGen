@@ -1,6 +1,6 @@
-from inline import split_nodes_delimiter, extract_markdown_images, extract_markdown_links, split_nodes_image, split_nodes_link, text_to_textnodes
 from textnode import TextNode, TextType
 import unittest # unittest will run all test_functions
+import inline
 
 class TestExtract(unittest.TestCase):
 
@@ -12,7 +12,7 @@ class TestExtract(unittest.TestCase):
     def test_split_nodes_delimiter(self):
         # Test split_nodes_delimiter method with multiple delimiters
         old_nodes1 = [TextNode("This is *some* text with *delimiters*", TextType.TEXT)]
-        new_nodes1 = split_nodes_delimiter(old_nodes1, "*", TextType.BOLD)
+        new_nodes1 = inline.split_nodes_delimiter(old_nodes1, "*", TextType.BOLD)
         self.assertEqual(new_nodes1, [TextNode("This is ", TextType.TEXT),
                                      TextNode("some", TextType.BOLD),
                                      TextNode(" text with ", TextType.TEXT),
@@ -21,14 +21,14 @@ class TestExtract(unittest.TestCase):
     def test_split_nodes_delimiter_edge(self):
         # Test split_nodes_delimiter with delimiter at start
         old_nodes = [TextNode("_delimiter_ at the start", TextType.TEXT)]
-        new_nodes = split_nodes_delimiter(old_nodes, "_", TextType.ITALIC)
+        new_nodes = inline.split_nodes_delimiter(old_nodes, "_", TextType.ITALIC)
         self.assertEqual(new_nodes, [TextNode("delimiter", TextType.ITALIC),
                                      TextNode(" at the start", TextType.TEXT)])
     
     def test_split_nodes_delimiter_no_delimiters(self):
         # Test split_nodes_delimiter with no delimiters
         old_nodes = [TextNode("No delimiters here", TextType.TEXT)]
-        new_nodes = split_nodes_delimiter(old_nodes, "*", TextType.BOLD)
+        new_nodes = inline.split_nodes_delimiter(old_nodes, "*", TextType.BOLD)
         self.assertEqual([TextNode("No delimiters here", TextType.TEXT)], 
                          new_nodes)
      
@@ -36,19 +36,19 @@ class TestExtract(unittest.TestCase):
         # Test split_nodes_delimiter raises error for odd delimiters
         old_nodes = [TextNode("This is *an error", TextType.TEXT)]
         with self.assertRaises(ValueError):
-            split_nodes_delimiter(old_nodes, "*", TextType.BOLD)
+            inline.split_nodes_delimiter(old_nodes, "*", TextType.BOLD)
     
     def test_split_nodes_delimiter_empty_text(self):
         # Test split_nodes_delimiter with empty text
         old_nodes = [TextNode("", TextType.TEXT)]
-        new_nodes = split_nodes_delimiter(old_nodes, "*", TextType.BOLD)
+        new_nodes = inline.split_nodes_delimiter(old_nodes, "*", TextType.BOLD)
         self.assertEqual([TextNode("", TextType.TEXT)], 
                          new_nodes)
         
     def test_split_nodes_delimiter_consecutive(self):
         # Test split_nodes_delimiter with consecutive delimiters
         old_nodes = [TextNode("**bold1****bold2**", TextType.TEXT)]
-        new_nodes = split_nodes_delimiter(old_nodes, "**", TextType.BOLD)
+        new_nodes = inline.split_nodes_delimiter(old_nodes, "**", TextType.BOLD)
         self.assertEqual(new_nodes, [TextNode("bold1", TextType.BOLD),
                                      TextNode("bold2", TextType.BOLD)])
     
@@ -60,7 +60,7 @@ class TestExtract(unittest.TestCase):
             TextNode("Third node with _italic_ and *bold*", TextType.TEXT),
             TextNode("Fourth node is link", TextType.LINK, "https://example.com"),
         ]
-        new_nodes = split_nodes_delimiter(old_nodes, "*", TextType.BOLD)
+        new_nodes = inline.split_nodes_delimiter(old_nodes, "*", TextType.BOLD)
         self.assertEqual(new_nodes, [
             TextNode("First node with ", TextType.TEXT),
             TextNode("bold", TextType.BOLD),
@@ -76,23 +76,23 @@ class TestExtract(unittest.TestCase):
 
     def test_extract_single_image(self):
         text = "Here is an image: ![Alt text](https://example.com/image.png)"
-        urls = extract_markdown_images(text)
+        urls = inline.extract_markdown_images(text)
         self.assertEqual(urls, [("Alt text", "https://example.com/image.png")])
     
     def test_extract_multiple_images(self):
         text = "Images: ![Img1](https://example.com/img1.jpg) and ![Img2](https://example.com/img2.jpg)"
-        urls = extract_markdown_images(text)
+        urls = inline.extract_markdown_images(text)
         self.assertEqual(urls, [("Img1", "https://example.com/img1.jpg"),
                                  ("Img2", "https://example.com/img2.jpg")])
     
     def test_no_images(self):
         text = "This text has no images."
-        urls = extract_markdown_images(text)
+        urls = inline.extract_markdown_images(text)
         self.assertEqual(urls, [])
     
     def test_malformed_image_syntax(self):
         text = "Malformed ![Image](not a url"
-        urls = extract_markdown_images(text)
+        urls = inline.extract_markdown_images(text)
         self.assertEqual(urls, [])
     
     # EXTRACT MARKDOWN LINKS TESTS
@@ -101,23 +101,23 @@ class TestExtract(unittest.TestCase):
 
     def test_extract_single_link(self):
         text = "Here is a link: [Example](https://example.com)"
-        urls = extract_markdown_links(text)
+        urls = inline.extract_markdown_links(text)
         self.assertEqual(urls, [("Example", "https://example.com")])
     
     def test_extract_multiple_links(self):
         text = "Links: [Google](https://google.com) and [Bing](https://bing.com)"
-        urls = extract_markdown_links(text)
+        urls = inline.extract_markdown_links(text)
         self.assertEqual(urls, [("Google", "https://google.com"),
                                  ("Bing", "https://bing.com")])
     
     def test_no_links(self):
         text = "This text has no links."
-        urls = extract_markdown_links(text)
+        urls = inline.extract_markdown_links(text)
         self.assertEqual(urls, [])
     
     def test_malformed_link_syntax(self):
         text = "Malformed [Link](not a url"
-        urls = extract_markdown_links(text)
+        urls = inline.extract_markdown_links(text)
         self.assertEqual(urls, [])
     
     # SPLIT NODES IMAGE TESTS
@@ -130,7 +130,7 @@ class TestExtract(unittest.TestCase):
             "This is text with an ![image](https://i.imgur.com/zjjcJKZ.png) and another ![second image](https://i.imgur.com/3elNhQu.png)",
             TextType.TEXT,
         )
-        new_nodes = split_nodes_image([node])
+        new_nodes = inline.split_nodes_image([node])
         self.assertListEqual(
             [
                 TextNode("This is text with an ", TextType.TEXT),
@@ -145,17 +145,17 @@ class TestExtract(unittest.TestCase):
     
     def test_split_images_no_images(self):
         node = TextNode("This is just plain text.", TextType.TEXT)
-        new_nodes = split_nodes_image([node])
+        new_nodes = inline.split_nodes_image([node])
         self.assertListEqual([TextNode("This is just plain text.", TextType.TEXT)], new_nodes)
     
     def test_split_images_empty_text(self):
         node = TextNode("", TextType.TEXT)
-        new_nodes = split_nodes_image([node])
+        new_nodes = inline.split_nodes_image([node])
         self.assertListEqual([TextNode("", TextType.TEXT)], new_nodes)
     
     def test_split_images_start(self):
         node = TextNode("![start_image](https://example.com) is at the start.", TextType.TEXT)
-        new_nodes = split_nodes_image([node])
+        new_nodes = inline.split_nodes_image([node])
         self.assertListEqual(
             [
                 TextNode("start_image", TextType.IMAGE, "https://example.com"),
@@ -166,7 +166,7 @@ class TestExtract(unittest.TestCase):
     
     def test_split_images_end(self):
         node = TextNode("This is at the end ![end_image](https://example.com)", TextType.TEXT)
-        new_nodes = split_nodes_image([node])
+        new_nodes = inline.split_nodes_image([node])
         self.assertListEqual(
             [
                 TextNode("This is at the end ", TextType.TEXT),
@@ -177,7 +177,7 @@ class TestExtract(unittest.TestCase):
     
     def test_split_images_consecutive(self):
         node = TextNode("Consecutive ![img1](url1)![img2](url2) images.", TextType.TEXT)
-        new_nodes = split_nodes_image([node])
+        new_nodes = inline.split_nodes_image([node])
         self.assertListEqual(
             [
                 TextNode("Consecutive ", TextType.TEXT),
@@ -190,7 +190,7 @@ class TestExtract(unittest.TestCase):
     
     def test_split_images_only_image(self):
         node = TextNode("![only_image](https://example.com)", TextType.TEXT)
-        new_nodes = split_nodes_image([node])
+        new_nodes = inline.split_nodes_image([node])
         self.assertListEqual(
             [
                 TextNode("only_image", TextType.IMAGE, "https://example.com"),
@@ -203,7 +203,7 @@ class TestExtract(unittest.TestCase):
             "Image ![img](https://example.com/image.png) and link [link](https://example.com)",
             TextType.TEXT,
         )
-        new_nodes = split_nodes_image([node])
+        new_nodes = inline.split_nodes_image([node])
         self.assertListEqual(
             [
                 TextNode("Image ", TextType.TEXT),
@@ -214,7 +214,7 @@ class TestExtract(unittest.TestCase):
         )
     
     def test_split_images_list_of_nodes(self):
-        # this test iclude a variety of situations including nodes that are not plain text
+        # this test include a variety of situations including nodes that are not plain text
         nodes = [
             TextNode("First node with ![img1](url1)", TextType.TEXT),
             TextNode("Second node without image", TextType.TEXT),
@@ -224,7 +224,7 @@ class TestExtract(unittest.TestCase):
             TextNode("Sixth node is image", TextType.IMAGE, "https://example.com/image.png"),
             TextNode("Seventh node with [link](https://example.com)", TextType.TEXT),
         ]
-        new_nodes = split_nodes_image(nodes)
+        new_nodes = inline.split_nodes_image(nodes)
         self.assertListEqual(
             [
                 TextNode("First node with ", TextType.TEXT),
@@ -252,7 +252,7 @@ class TestExtract(unittest.TestCase):
             "This is text with a [link](https://example.com) and another [second link](https://example.org)",
             TextType.TEXT,
         )
-        new_nodes = split_nodes_link([node])
+        new_nodes = inline.split_nodes_link([node])
         self.assertListEqual(
             [
                 TextNode("This is text with a ", TextType.TEXT),
@@ -265,17 +265,17 @@ class TestExtract(unittest.TestCase):
     
     def test_split_links_no_links(self):
         node = TextNode("This is just plain text.", TextType.TEXT)
-        new_nodes = split_nodes_link([node])
+        new_nodes = inline.split_nodes_link([node])
         self.assertListEqual([TextNode("This is just plain text.", TextType.TEXT)], new_nodes)
     
     def test_split_links_empty_text(self):
         node = TextNode("", TextType.TEXT)
-        new_nodes = split_nodes_link([node])
+        new_nodes = inline.split_nodes_link([node])
         self.assertListEqual([TextNode("", TextType.TEXT)], new_nodes)
     
     def test_split_links_start(self):
         node = TextNode("[start_link](https://example.com) is at the start.", TextType.TEXT)
-        new_nodes = split_nodes_link([node])
+        new_nodes = inline.split_nodes_link([node])
         self.assertListEqual(
             [
                 TextNode("start_link", TextType.LINK, "https://example.com"),
@@ -286,7 +286,7 @@ class TestExtract(unittest.TestCase):
     
     def test_split_links_end(self):
         node = TextNode("This is at the end [end_link](https://example.com)", TextType.TEXT)
-        new_nodes = split_nodes_link([node])
+        new_nodes = inline.split_nodes_link([node])
         self.assertListEqual(
             [
                 TextNode("This is at the end ", TextType.TEXT),
@@ -297,7 +297,7 @@ class TestExtract(unittest.TestCase):
     
     def test_split_links_consecutive(self):
         node = TextNode("Consecutive [link1](url1)[link2](url2) links.", TextType.TEXT)
-        new_nodes = split_nodes_link([node])
+        new_nodes = inline.split_nodes_link([node])
         self.assertListEqual(
             [
                 TextNode("Consecutive ", TextType.TEXT),
@@ -310,7 +310,7 @@ class TestExtract(unittest.TestCase):
     
     def test_split_links_only_link(self):
         node = TextNode("[only_link](https://example.com)", TextType.TEXT)
-        new_nodes = split_nodes_link([node])
+        new_nodes = inline.split_nodes_link([node])
         self.assertListEqual(
             [
                 TextNode("only_link", TextType.LINK, "https://example.com"),
@@ -325,7 +325,7 @@ class TestExtract(unittest.TestCase):
                 TextType.TEXT,
             )
         ]
-        new_nodes = split_nodes_link(node)
+        new_nodes = inline.split_nodes_link(node)
         self.assertListEqual(
             [
                 TextNode("Link ", TextType.TEXT),
@@ -336,7 +336,7 @@ class TestExtract(unittest.TestCase):
         )
 
     def test_split_links_list_of_nodes(self):
-        # this test iclude a variety of situations including nodes that are not plain text
+        # this test icludes a variety of situations including nodes that are not plain text
         nodes = [
             TextNode("First node with [link1](url1)", TextType.TEXT),
             TextNode("Second node without link", TextType.TEXT),
@@ -346,7 +346,7 @@ class TestExtract(unittest.TestCase):
             TextNode("Sixth node is link", TextType.LINK, "https://example.com"),
             TextNode("Seventh node with ![image](https://example.com/image.png)", TextType.TEXT),
         ]
-        new_nodes = split_nodes_link(nodes)
+        new_nodes = inline.split_nodes_link(nodes)
         self.assertListEqual(
             [
                 TextNode("First node with ", TextType.TEXT),
@@ -370,7 +370,7 @@ class TestExtract(unittest.TestCase):
 
     def test_text_to_text_nodes(self):
         text = "This is **text** with an _italic_ word and a `code block` and an ![obi wan image](https://i.imgur.com/fJRm4Vk.jpeg) and a [link](https://boot.dev)"
-        nodes = text_to_textnodes(text)
+        nodes = inline.text_to_textnodes(text)
         self.assertListEqual(
             [
                 TextNode("This is ", TextType.TEXT),
