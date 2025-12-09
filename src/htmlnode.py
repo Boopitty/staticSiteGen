@@ -38,7 +38,7 @@ class LeafNode(HTMLNode):
             # if no value, cannot convert to HTML
             raise ValueError("LeafNode must have a value to convert to HTML")
         if self.tag is None:
-            # if no tag, print raw value
+            # if no tag, return raw value
             return self.value
         return f"<{self.tag}{self.props_to_html()}>{self.value}</{self.tag}>"
 
@@ -55,4 +55,14 @@ class ParentNode(HTMLNode):
         if not self.children:
             raise ValueError("ParentNode must have children to convert to HTML")
         # Return HTML string with children converted to HTML
-        return f"<{self.tag}{self.props_to_html()}>{''.join(child.to_html() for child in self.children)}</{self.tag}>"
+
+        # Check for grandchildren (lists of children)
+        text = ""
+        for child in self.children:
+            if isinstance(child, list):
+                for grandchild in child:
+                    text += grandchild.to_html()
+            else:
+                text += child.to_html()
+        return f"<{self.tag}{self.props_to_html()}>{text}</{self.tag}>"
+    

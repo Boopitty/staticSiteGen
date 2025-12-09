@@ -1,5 +1,5 @@
 from enum import Enum
-from htmlnode import LeafNode, ParentNode
+from htmlnode import LeafNode
 
 class TextType(Enum):
     # All possible text types
@@ -10,7 +10,7 @@ class TextType(Enum):
     LINK = "link"
     IMAGE = "image"
     # Unused types for potential future use
-    # DIV = "div"
+    DIV = "div"
     # SPAN = "span"
 
 class TextNode():
@@ -47,4 +47,6 @@ class TextNode():
                 return LeafNode(tag="a", value=text_node.text, props={"href": text_node.url})
             case TextType.IMAGE:
                 return LeafNode(tag="img", value="", props={"src": text_node.url, "alt": text_node.text})
+            case _:
+                raise ValueError(f"Unknown TextType: {text_node.text_type}")
               

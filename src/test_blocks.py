@@ -19,9 +19,9 @@ This is the same paragraph on a new line
         new_blocks = blocks.markdown_to_blocks(md)
         self.assertEqual(new_blocks,
                          [
-                             "This is **bolded** paragraph",
-                             "This is another paragraph with _italic_ text and `code` here\nThis is the same paragraph on a new line",
-                             "- This is a list\n- with items"
+                            "This is **bolded** paragraph",
+                            "This is another paragraph with _italic_ text and `code` here\nThis is the same paragraph on a new line",
+                            "- This is a list\n- with items"
                          ])
         
     def test_markdown_to_blocks_empty_string(self):
@@ -51,7 +51,7 @@ This is the same paragraph on a new line
 
     # Test the block_to_type function
     # block_to_type determines the block type based on markdown syntax
-    
+
     def test_block_to_type_paragraph(self):
         block = "This is a simple paragraph."
         block_type = blocks.block_to_type(block)
