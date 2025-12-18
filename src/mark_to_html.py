@@ -20,7 +20,13 @@ def markdown_to_html_node(markdown):
                 htmls.append(ParentNode(tag="p", children=text_to_children(" ".join(list_items))))
 
             case BlockType.HEADING:
-                htmls.append(ParentNode(tag=f"heading", children=text_to_children(block.lstrip("# "))))
+                num = 0
+                for char in block.lstrip():
+                    if char == "#":
+                        num += 1
+                    else:
+                        break
+                htmls.append(ParentNode(tag=f"h{num}", children=text_to_children(block.lstrip("# "))))
 
             case BlockType.CODE:
                 # do not process inline text for code blocks              
@@ -30,7 +36,10 @@ def markdown_to_html_node(markdown):
                 htmls.append(textNode)
 
             case BlockType.QUOTE:
-                htmls.append(ParentNode(tag="quote", children=text_to_children(block.lstrip("> "))))
+                items = block.split("\n")
+                list_items = [item.lstrip("> ") for item in items if item.lstrip("> ") != ""]
+                list_items = "\n".join(list_items)
+                htmls.append(ParentNode(tag="blockquote", children=text_to_children(list_items)))
 
             case BlockType.U_LIST:
                 # split by "\n" and create a list of strings

@@ -9,8 +9,8 @@ class TextType(Enum):
     CODE = "code"
     LINK = "link"
     IMAGE = "image"
-    # Unused types for potential future use
     DIV = "div"
+    # Unused types for potential future use
     # SPAN = "span"
 
 class TextNode():

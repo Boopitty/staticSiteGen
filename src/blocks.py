@@ -30,9 +30,9 @@ def block_to_type(block):
         return BlockType.CODE
     
     # Quote syntax: lines starting with >
-    elif block.startswith("> "):
+    elif block.startswith(">"):
         for line in block.split("\n"):
-            if not line.startswith("> "):
+            if not line.startswith(">"):
                 return BlockType.PARAGRAPH
         return BlockType.QUOTE
     
