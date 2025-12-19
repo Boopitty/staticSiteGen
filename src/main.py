@@ -6,7 +6,11 @@ def main():
     # Copy content from the static directory to the public directory
     copy_directory(src="static", dest="public")
     # Generate content for the website using the from, template, and destination paths
-    generate_page(from_path="content/index.md", template_path="template.html", dest_path="public/index.html")
+    generate_pages_recursive(
+        dir_path_content="content",
+        template_path="template.html",
+        dest_dir_path="public"
+        )
     print("halt operation with 'Ctrl + z'")
 
 # create a recursive function to copy all contents from a 
@@ -16,7 +20,7 @@ def copy_directory(src, dest):
     # First, delete contents of destination directory if it exists
     if os.path.exists(dest):
         shutil.rmtree(dest)
-        os.makedirs(dest)
+    os.makedirs(dest)
 
     # Now copy contents from source to destination
     if os.path.exists(src):
@@ -65,11 +69,34 @@ def generate_page(from_path, template_path, dest_path):
 
     # replace {{title}} and {{content}} placeholders in template with title and html content
     template = template.replace("{{ Title }}", title).replace("{{ Content }}", html_content)
-    
+
     # write the new full HTML
     with open(dest_path, "w") as file:
         file.write(template)
 
+# recursively generate pages
+def generate_pages_recursive(dir_path_content, template_path, dest_dir_path):
+    # Crawl every entry in the content directory
+    # for each md file found, generate new html file w/ the same template.html
+    # the generated pages should be writen in the public dir w/ same directory structure
+    for item in os.listdir(dir_path_content):
+        # create variables to hold the current path
+        # and wanted destination path
+        from_path = os.path.join(dir_path_content, item)
+        
 
+        # if the item is a file, generate a page out of it
+        if os.path.isfile(from_path):
+            file_item = item.split(".")[0] + ".html"
+            dest_path = os.path.join(dest_dir_path, file_item)
+            generate_page(from_path, template_path, dest_path)
+
+        # if the item is a directory, recursively call this function
+        elif os.path.isdir(from_path):
+            # create a directory for this item if not already there
+            dest_path = os.path.join(dest_dir_path, item)
+            if not os.path.exists(dest_path):
+                os.mkdir(dest_path)
+            generate_pages_recursive(from_path, template_path, dest_path)
 # Call the main function
 main()
