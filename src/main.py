@@ -1,15 +1,21 @@
 from mark_to_html import markdown_to_html_node
 import os
 import shutil
+import sys
 
 def main():
+    if len(sys.argv) > 1:
+        basepath = sys.argv[1]
+    else:
+        basepath = "/"
     # Copy content from the static directory to the public directory
-    copy_directory(src="static", dest="public")
+    copy_directory(src="static", dest="docs")
     # Generate content for the website using the from, template, and destination paths
     generate_pages_recursive(
         dir_path_content="content",
         template_path="template.html",
-        dest_dir_path="public"
+        dest_dir_path="docs",
+        basepath = basepath
         )
     print("halt operation with 'Ctrl + z'")
 
@@ -48,7 +54,7 @@ def extract_title(markdown):
     else:
         raise Exception("No h1 header found in markdown")
     
-def generate_page(from_path, template_path, dest_path):
+def generate_page(from_path, template_path, dest_path, basepath):
     # print a message indicating the start of page generation
     # print(f"Generating page from {from_path} to {dest_path} using {template_path}")
 
@@ -69,13 +75,14 @@ def generate_page(from_path, template_path, dest_path):
 
     # replace {{title}} and {{content}} placeholders in template with title and html content
     template = template.replace("{{ Title }}", title).replace("{{ Content }}", html_content)
+    template = template.replace('href="/', f'href="{basepath}').replace('src="/', f'src="{basepath}')
 
     # write the new full HTML
     with open(dest_path, "w") as file:
         file.write(template)
 
 # recursively generate pages
-def generate_pages_recursive(dir_path_content, template_path, dest_dir_path):
+def generate_pages_recursive(dir_path_content, template_path, dest_dir_path, basepath):
     # Crawl every entry in the content directory
     # for each md file found, generate new html file w/ the same template.html
     # the generated pages should be writen in the public dir w/ same directory structure
@@ -91,7 +98,7 @@ def generate_pages_recursive(dir_path_content, template_path, dest_dir_path):
             file_item = item.split(".")[0] + ".html"
             # join the file to the path
             dest_path = os.path.join(dest_dir_path, file_item)
-            generate_page(from_path, template_path, dest_path)
+            generate_page(from_path, template_path, dest_path, basepath)
 
         # if the item is a directory, recursively call this function
         elif os.path.isdir(from_path):
@@ -100,6 +107,6 @@ def generate_pages_recursive(dir_path_content, template_path, dest_dir_path):
             # create a directory for this item if not already there
             if not os.path.exists(dest_path):
                 os.mkdir(dest_path)
-            generate_pages_recursive(from_path, template_path, dest_path)
+            generate_pages_recursive(from_path, template_path, dest_path, basepath)
 # Call the main function
 main()
