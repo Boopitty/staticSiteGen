@@ -1,4 +1,4 @@
 # staticSiteGen
-A static website generator
-use the following command in the terminal and search http://localhost:8888 in your browser to see the contents of the index.html file
-python3 -m http.server 8888
+A static website generator.
+Images are entered in the static file,
+and the content is in the content folder in markdown format.
